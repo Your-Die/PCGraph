@@ -1,0 +1,16 @@
+{
+  "name": "com.chinchillada.pcgraph",
+  "version": "1.0.0",
+  "displayName": "PCG Graph",
+  "unity": "2021.1",
+  "unityRelease": "25f1",
+  "dependencies": {
+    "com.chinchillada.foundation" : "https://github.com/Your-Die/Foundation.git"
+  },
+  "keywords": [],
+  "author": {
+    "name": "Jordy van Opstal",
+    "email": "jordy_van_opstal@live.nl",
+    "url": "https://jordyvanopstal.com/"
+  }
+}

@@ -1,0 +1,17 @@
+{
+    "name": "Chinchillada.PCGraph.Runtime",
+    "rootNamespace": "Chinchillada.PCGraph",
+    "references": [
+        "GUID:ca937d03ee5dd4d699091438dc0f3ae6",
+        "GUID:1eaec2d7d70f722408cb2417d51f1005"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
