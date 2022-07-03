@@ -5,7 +5,7 @@ namespace Chinchillada.PCGraph.Nodes.Floats
     using UnityEngine;
 
     [Serializable]
-    public abstract class FloatArithmeticNode : FloatGeneratorNode
+    public abstract class FloatArithmeticNode : GeneratorNode<float>
     {
         [SerializeField, Input, ShowAsDrawer] public float a;
         [SerializeField, Input, ShowAsDrawer] public float b;

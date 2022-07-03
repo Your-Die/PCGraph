@@ -4,24 +4,23 @@ namespace Chinchillada.PCGraph.Editor
     using Sirenix.OdinInspector.Editor;
     using UnityEditor;
     using UnityEngine;
+    using UnityEngine.UIElements;
 
     [CustomEditor(typeof(PCGraph))]
-    public class PCGraphAssetInspector : OdinEditor
+    public class PCGraphAssetInspector : GraphInspector
     {
-        public override void OnInspectorGUI()
+        protected override void CreateInspector()
         {
-            if (GUILayout.Button("Edit graph", GUILayout.Height(40)))
-            {
-                this.OpenWindow();
-            }
+            base.CreateInspector();
 
-            base.OnInspectorGUI();
+            var button = new Button(this.OpenWindow) { text = "Edit Graph" };
+            this.root.Add(button);
         }
 
         private void OpenWindow()
         {
             var window      = EditorWindow.GetWindow<PCGraphWindow>();
-            var targetGraph = (BaseGraph) this.target;
+            var targetGraph = (BaseGraph)this.target;
 
             window.InitializeGraph(targetGraph);
         }
