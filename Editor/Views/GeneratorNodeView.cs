@@ -4,39 +4,68 @@ namespace Chinchillada.PCGraph.Editor
     using GraphProcessor;
     using UnityEngine.UIElements;
 
-    public abstract class GeneratorNodeView<TNode, TResult> : BaseNodeView where TNode : GeneratorNode<TResult>
+    [NodeCustomEditor(typeof(GeneratorNode))]
+    public class GeneratorNodeView : BaseNodeView
     {
+        private TextField textPreview;
+        
+        private GeneratorNode Node => (GeneratorNode)this.nodeTarget;
+        
+        protected virtual bool UseTextPreview => true;
+
         public override void Enable()
         {
-            var node = this.GetTargetNode();
-
             this.SetupControls();
 
-            node.Generated += this.UpdatePreview;
+            this.nodeTarget.onProcessed += this.OnNodeProcessed;
 
             base.Enable();
         }
-
+        
         public override void Disable()
         {
-            var node = this.GetTargetNode();
-            node.Generated -= this.UpdatePreview;
-
+            this.nodeTarget.onProcessed -= this.OnNodeProcessed;
+          
             base.Disable();
         }
 
-        protected abstract IEnumerable<VisualElement> CreateControls();
-
-        protected abstract void UpdatePreview(TResult nodeResult);
-        
         private void SetupControls()
         {
+            if (this.UseTextPreview)
+            {
+                this.textPreview = new TextField();
+                this.controlsContainer.Add(this.textPreview);
+            }
+            
             var controls = this.CreateControls();
 
             foreach (var control in controls)
                 this.controlsContainer.Add(control);
         }
 
-        private TNode GetTargetNode() => (TNode) this.nodeTarget;
+        protected virtual IEnumerable<VisualElement> CreateControls()
+        {
+            yield break;
+        }
+        
+        protected virtual void OnNodeProcessed()
+        {
+            if (this.UseTextPreview) 
+                this.textPreview.value = this.Node.ResultObject.ToString();
+        }
+    }
+
+    public abstract class BaseGeneratorNodeView<TNode, TResult> : GeneratorNodeView 
+        where TNode : GeneratorNode<TResult>
+    {
+        protected override void OnNodeProcessed()
+        {
+            base.OnNodeProcessed();
+
+            var node = (TNode)this.nodeTarget;
+            this.UpdatePreview(node.Result);
+        }
+
+        protected abstract void UpdatePreview(TResult nodeResult);
     }
 }

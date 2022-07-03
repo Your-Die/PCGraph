@@ -7,7 +7,7 @@ namespace Chinchillada.PCGraph.Editor
     using UnityEngine.UIElements;
 
     [NodeCustomEditor(typeof(FloatGeneratorNode))]
-    public class FloatGeneratorNodeView : GeneratorNodeView<FloatGeneratorNode, float>
+    public class FloatGeneratorNodeView : BaseGeneratorNodeView<FloatGeneratorNode, float>
     {
         private FloatField previewField;
 

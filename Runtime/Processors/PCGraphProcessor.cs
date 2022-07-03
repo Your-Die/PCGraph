@@ -4,23 +4,28 @@ namespace Chinchillada.PCGraph
     using System.Collections.Generic;
     using System.Linq;
     using GraphProcessor;
+    using UnityEditor.Graphs;
 
     public class PCGraphProcessor : GraphProcessorBase
     {
         private new readonly PCGraph graph;
 
-        private readonly IFactory<IRNG> randomFactory;
+        private readonly IRNG random;
 
         private readonly Dictionary<Type, BaseNode> outputsByType = new Dictionary<Type, BaseNode>();
 
         public PCGraphProcessor(PCGraph graph) : this(graph, graph.RNG)
         {
         }
-
-        public PCGraphProcessor(PCGraph graph, IFactory<IRNG> randomFactory) : base(graph)
+        
+        public PCGraphProcessor(PCGraph graph, IFactory<IRNG> randomFactory) : this(graph, randomFactory.Create())
         {
-            this.graph         = graph;
-            this.randomFactory = randomFactory;
+        }
+
+        public PCGraphProcessor(PCGraph graph, IRNG random) : base(graph)
+        {
+            this.graph = graph;
+            this.random = random;
         }
 
         public T Generate<T>()
@@ -34,12 +39,10 @@ namespace Chinchillada.PCGraph
 
         public override void Run()
         {
-            var random = this.randomFactory.Create();
-            
             foreach (var node in this.NodesByComputeOrder)
             {
                 if (node is IUsesRNG randomNode)
-                    randomNode.RNG = random;
+                    randomNode.RNG = this.random;
 
                 node.OnProcess();
             }

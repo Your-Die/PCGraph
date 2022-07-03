@@ -3,12 +3,19 @@ namespace Chinchillada.PCGraph
     using System;
     using GraphProcessor;
 
+    public abstract class GeneratorNode : BaseNode
+    {
+        public abstract object ResultObject { get; }
+    }
+
     [Serializable]
-    public abstract class GeneratorNode<T> : BaseNode, IGeneratorNode<T>
+    public abstract class GeneratorNode<T> : GeneratorNode, IGeneratorNode<T>
     {
         [Output] public T output;
 
         public T Result => this.output;
+
+        public override object ResultObject => this.Result;
 
         public event Action<T> Generated;
 
