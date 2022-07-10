@@ -51,7 +51,12 @@ namespace Chinchillada.PCGraph.Editor
         protected virtual void OnNodeProcessed()
         {
             if (this.UseTextPreview) 
-                this.textPreview.value = this.Node.ResultObject.ToString();
+                this.textPreview.value = this.Stringify();
+        }
+
+        protected virtual string Stringify()
+        {
+            return this.Node.ResultObject.ToString();
         }
     }
 
@@ -60,10 +65,10 @@ namespace Chinchillada.PCGraph.Editor
     {
         protected override void OnNodeProcessed()
         {
-            base.OnNodeProcessed();
-
             var node = (TNode)this.nodeTarget;
             this.UpdatePreview(node.Result);
+            
+            base.OnNodeProcessed();
         }
 
         protected abstract void UpdatePreview(TResult nodeResult);
