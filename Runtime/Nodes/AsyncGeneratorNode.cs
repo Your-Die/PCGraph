@@ -22,6 +22,7 @@ namespace Chinchillada.PCGraph
                 
                 this.OnGenerate(result);
                 this.InvokeOnProcessed();
+                
                 yield return null;
                 ticksToGo = ticksPerFrame;
             }
