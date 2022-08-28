@@ -19,7 +19,7 @@ namespace Chinchillada.PCGraph.Editor
         {
             this.title = "Process Panel";
 
-            var pcgGraphView = (PCGraphView) graphView;
+            var pcgGraphView = (PCGraphView)graphView;
             this.graph = pcgGraphView.Graph;
 
             foreach (var element in this.BuildElements())
@@ -28,10 +28,10 @@ namespace Chinchillada.PCGraph.Editor
 
         private IEnumerable<VisualElement> BuildElements()
         {
-            yield return new Button(this.Refresh) {name         = "ActionButton", text = "Refresh"};
-            yield return new Button(this.RefreshStepwise) {name = "StepButton", text   = "Refresh Stepwise"};
-            
-            yield return durationPerNode = new FloatField("Step duration"){value = 0.8f};
+            yield return new Button(this.Refresh) { name         = "ActionButton", text = "Refresh" };
+            yield return new Button(this.RefreshStepwise) { name = "StepButton", text   = "Refresh Stepwise" };
+
+            yield return durationPerNode = new FloatField("Step duration") { value = 0.8f };
         }
 
         private void Refresh()
@@ -58,7 +58,12 @@ namespace Chinchillada.PCGraph.Editor
                 var process = processor.RunAsync();
 
                 foreach (var stepDuration in process)
-                    yield return new EditorWaitForSeconds(stepDuration);
+                {
+                    if (stepDuration > 0)
+                        yield return new EditorWaitForSeconds(stepDuration);
+                    else
+                        yield return null;
+                }
             }
         }
     }

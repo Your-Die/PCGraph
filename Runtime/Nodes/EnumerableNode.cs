@@ -6,7 +6,7 @@ namespace Chinchillada.PCGraph
     {
         int ExpectedIterations { get; }
 
-        IEnumerator OnProcessAsync();
+        IEnumerator OnProcessAsync(int ticksPerFrame);
     }
 
     public static class EnumeratorExtensions

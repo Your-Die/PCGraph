@@ -11,20 +11,20 @@ namespace Chinchillada.PCGraph
         public override T Generate() => this.GenerateAsync().Last();
 
         public virtual int ExpectedIterations => 1;
-
-        public IEnumerator OnProcessAsync()
+        public IEnumerator OnProcessAsync(int ticksPerFrame)
         {
-            this.inputPorts.PullDatas();
-
+            int ticksToGo = ticksPerFrame;
+            
             foreach (var result in this.GenerateAsync())
             {
+                if (--ticksToGo > 0)
+                    continue;
+                
                 this.OnGenerate(result);
                 this.InvokeOnProcessed();
-                
                 yield return null;
+                ticksToGo = ticksPerFrame;
             }
-            
-            this.outputPorts.PushDatas();
         }
 
         protected abstract IEnumerable<T> GenerateAsync();
