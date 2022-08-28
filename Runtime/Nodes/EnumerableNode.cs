@@ -4,8 +4,8 @@ namespace Chinchillada.PCGraph
 
     public interface IAsyncNode
     {
-        int CalculateExpectedIterations();
-        
+        int ExpectedIterations { get; }
+
         IEnumerator OnProcessAsync();
     }
 

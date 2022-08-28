@@ -32,7 +32,7 @@ namespace Chinchillada.PCGraph
                 
                 if (node is IAsyncNode asyncNode)
                 {
-                    var expectedIterations   = asyncNode.CalculateExpectedIterations();
+                    var expectedIterations   = asyncNode.ExpectedIterations;
                     var durationPerIteration = this.durationPerNode / expectedIterations;
                     
                     var enumerator = asyncNode.OnProcessAsync();
