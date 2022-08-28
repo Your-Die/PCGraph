@@ -4,6 +4,7 @@ namespace Chinchillada.PCGraph.Editor
     using System.Collections.Generic;
     using GraphProcessor;
     using Unity.EditorCoroutines.Editor;
+    using UnityEditor.UIElements;
     using UnityEngine.UIElements;
 
     public class PCGraphProcessorView : PinnedElementView
@@ -12,7 +13,7 @@ namespace Chinchillada.PCGraph.Editor
 
         private EditorCoroutine refreshRoutine;
 
-        private const float StepInterval = 0.2f;
+        private static FloatField durationPerNode;
 
         protected override void Initialize(BaseGraphView graphView)
         {
@@ -29,6 +30,8 @@ namespace Chinchillada.PCGraph.Editor
         {
             yield return new Button(this.Refresh) {name         = "ActionButton", text = "Refresh"};
             yield return new Button(this.RefreshStepwise) {name = "StepButton", text   = "Refresh Stepwise"};
+            
+            yield return durationPerNode = new FloatField("Step duration"){value = 0.8f};
         }
 
         private void Refresh()
@@ -41,24 +44,21 @@ namespace Chinchillada.PCGraph.Editor
 
         private void RefreshStepwise()
         {
-            var processor = new AsyncGraphProcessor(this.graph);
+            var processor = new AsyncGraphProcessor(this.graph, durationPerNode.value);
 
             if (this.refreshRoutine != null)
                 EditorCoroutineUtility.StopCoroutine(this.refreshRoutine);
 
             processor.UpdateComputeOrder();
 
-            this.refreshRoutine = EditorCoroutineUtility.StartCoroutine(RefreshRoutine(), this);
+            this.refreshRoutine = EditorCoroutineUtility.StartCoroutine(Routine(), this);
 
-            IEnumerator RefreshRoutine()
+            IEnumerator Routine()
             {
-                var subRoutine = processor.RunAsync();
+                var process = processor.RunAsync();
 
-                while (subRoutine.MoveNext())
-                {
-                    yield return subRoutine.Current;
-                    yield return new EditorWaitForSeconds(StepInterval);
-                }
+                foreach (var stepDuration in process)
+                    yield return new EditorWaitForSeconds(stepDuration);
             }
         }
     }

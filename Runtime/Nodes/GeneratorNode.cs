@@ -17,8 +17,6 @@ namespace Chinchillada.PCGraph
 
         public override object ResultObject => this.Result;
 
-        public event Action<T> Generated;
-
         protected override void Process()
         {
             var result = this.Generate();
@@ -31,7 +29,6 @@ namespace Chinchillada.PCGraph
         protected void OnGenerate(T result)
         {
             this.output = result;
-            this.Generated?.Invoke(result);
         }
 
         public override string ToString() => $"{this.graph.name}/{this.name}";
