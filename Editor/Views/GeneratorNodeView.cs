@@ -1,6 +1,8 @@
-namespace Chinchillada.PCGraph.Editor
+namespace Chinchillada.PCGraphs.Editor
 {
     using System.Collections.Generic;
+    using System.Linq;
+    using Chinchillada;
     using GraphProcessor;
     using UnityEngine.UIElements;
 
@@ -8,8 +10,8 @@ namespace Chinchillada.PCGraph.Editor
     public class GeneratorNodeView : BaseNodeView
     {
         private TextField textPreview;
-        
-        private GeneratorNode Node => (GeneratorNode)this.nodeTarget;
+
+        protected GeneratorNode Node => (GeneratorNode)this.nodeTarget;
         
         protected virtual bool UseTextPreview => true;
 
@@ -37,15 +39,11 @@ namespace Chinchillada.PCGraph.Editor
                 this.controlsContainer.Add(this.textPreview);
             }
             
-            var controls = this.CreateControls();
-
-            foreach (var control in controls)
-                this.controlsContainer.Add(control);
+            this.CreateControls(this.controlsContainer);
         }
 
-        protected virtual IEnumerable<VisualElement> CreateControls()
+        protected virtual void CreateControls(VisualElement controlContainer)
         {
-            yield break;
         }
         
         protected virtual void OnNodeProcessed()
@@ -72,5 +70,24 @@ namespace Chinchillada.PCGraph.Editor
         }
 
         protected abstract void UpdatePreview(TResult nodeResult);
+
+        protected override void CreateControls(VisualElement controlContainer)
+        {
+            if (!(this.Node is IIteratorNode<TResult> iteratorNode))
+                return;
+            
+            var button = new Button(() => this.RunIteration(iteratorNode))
+            {
+                text = "Iterate"
+            };
+                
+            controlContainer.Add(button);
+        }
+
+        private void RunIteration(IIteratorNode<TResult> iteratorNode)
+        {
+            var iteration = iteratorNode.RunIteration();
+            UpdatePreview(iteration);
+        }
     }
 }

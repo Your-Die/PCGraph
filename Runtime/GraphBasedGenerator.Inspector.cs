@@ -1,4 +1,4 @@
-namespace Chinchillada.PCGraph
+namespace Chinchillada.PCGraphs
 {
     
 #if UNITY_EDITOR

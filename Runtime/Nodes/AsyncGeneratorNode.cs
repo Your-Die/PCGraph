@@ -1,4 +1,4 @@
-namespace Chinchillada.PCGraph
+namespace Chinchillada.PCGraphs
 {
     using System;
     using System.Collections;
@@ -22,7 +22,7 @@ namespace Chinchillada.PCGraph
                 
                 this.OnGenerate(result);
                 this.InvokeOnProcessed();
-                
+
                 yield return null;
                 ticksToGo = ticksPerFrame;
             }

@@ -1,4 +1,4 @@
-namespace Chinchillada.PCGraph.Editor
+namespace Chinchillada.PCGraphs.Editor
 {
     using GraphProcessor;
     using Sirenix.OdinInspector.Editor;

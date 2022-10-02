@@ -1,4 +1,4 @@
-namespace Chinchillada.PCGraph.Editor
+namespace Chinchillada.PCGraphs.Editor
 {
     using System.Collections;
     using System.Collections.Generic;

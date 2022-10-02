@@ -1,4 +1,4 @@
-namespace Chinchillada.PCGraph
+namespace Chinchillada.PCGraphs
 {
     using System;
     using System.Collections.Generic;

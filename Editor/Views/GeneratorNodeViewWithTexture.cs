@@ -1,6 +1,6 @@
-namespace Chinchillada.PCGraph.Editor
+namespace Chinchillada.PCGraphs.Editor
 {
-    using System.Collections.Generic;
+    using Chinchillada;
     using UnityEngine;
     using UnityEngine.UIElements;
 
@@ -11,9 +11,12 @@ namespace Chinchillada.PCGraph.Editor
 
         private Image previewImage;
         
-        protected override IEnumerable<VisualElement> CreateControls()
+        protected override void CreateControls(VisualElement controlContainer)
         {
-            yield return this.previewImage = new Image();
+            base.CreateControls(controlContainer);
+            
+            this.previewImage = new Image();
+            controlContainer.Add(this.previewImage);
         }
 
         protected override void UpdatePreview(TResult nodeResult)

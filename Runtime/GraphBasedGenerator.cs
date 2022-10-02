@@ -1,6 +1,7 @@
-namespace Chinchillada.PCGraph
+namespace Chinchillada.PCGraphs
 {
     using System;
+    using Chinchillada;
     using Sirenix.OdinInspector;
     using Sirenix.Serialization;
 

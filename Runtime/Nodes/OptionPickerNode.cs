@@ -2,7 +2,7 @@ namespace Chinchillada.MagicCircles.Nodes
 {
     using System.Collections.Generic;
     using System.Linq;
-    using PCGraph;
+    using PCGraphs;
 
     public abstract class OptionPickerNode<T> : GeneratorNode<T>, IUsesRNG
     {

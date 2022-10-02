@@ -1,4 +1,4 @@
-namespace Chinchillada.PCGraph.Nodes.Floats
+namespace Chinchillada.PCGraphs.Nodes.Floats
 {
     using System;
     using GraphProcessor;
