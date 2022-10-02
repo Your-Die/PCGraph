@@ -46,7 +46,6 @@ namespace Chinchillada.PCGraphs
                 else
                 {
                     node.OnProcess();
-                    yield return this.durationPerNode;
                 }
 
                 node.PushOutputs();
