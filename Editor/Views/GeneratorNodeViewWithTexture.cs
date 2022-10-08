@@ -7,7 +7,7 @@ namespace Chinchillada.PCGraphs.Editor
     public abstract class GeneratorNodeViewWithTexture<TNode, TResult> : BaseGeneratorNodeView<TNode, TResult>
         where TNode : GeneratorNode<TResult>
     {
-        private const int MinResolution = 100;
+        protected const int MinResolution = 100;
 
         private Image previewImage;
         
@@ -26,6 +26,8 @@ namespace Chinchillada.PCGraphs.Editor
         }
 
         protected abstract Texture2D GenerateTexture(TResult result);
+
+        protected Texture2D GetEmptyTexture() => new Texture2D(MinResolution, MinResolution);
         
         private static Texture2D EnsureResolution(Texture2D texture)
         {
