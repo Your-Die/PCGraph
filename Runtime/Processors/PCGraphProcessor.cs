@@ -4,7 +4,6 @@ namespace Chinchillada.PCGraphs
     using System.Collections.Generic;
     using System.Linq;
     using GraphProcessor;
-    using UnityEditor.Graphs;
 
     public class PCGraphProcessor : GraphProcessorBase
     {
@@ -14,18 +13,10 @@ namespace Chinchillada.PCGraphs
 
         private readonly Dictionary<Type, BaseNode> outputsByType = new Dictionary<Type, BaseNode>();
 
-        public PCGraphProcessor(PCGraph graph) : this(graph, graph.RNG)
-        {
-        }
-        
-        public PCGraphProcessor(PCGraph graph, IFactory<IRNG> randomFactory) : this(graph, randomFactory.Create())
-        {
-        }
-
-        public PCGraphProcessor(PCGraph graph, IRNG random) : base(graph)
+        public PCGraphProcessor(PCGraph graph, IRNG random = null) : base(graph)
         {
             this.graph = graph;
-            this.random = random;
+            this.random = random ?? UnityRandom.Shared;
         }
 
         public T Generate<T>()

@@ -3,7 +3,6 @@ namespace Chinchillada.PCGraphs
     
 #if UNITY_EDITOR
 
-    using GraphProcessor;
     using Sirenix.OdinInspector;
     using UnityEditor;
     using UnityEngine;

@@ -1,44 +1,40 @@
+using GraphProcessor;
+
 namespace Chinchillada.PCGraphs
 {
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
-    using UnityEditor.Experimental.GraphView;
     using UnityEngine;
 
     public class AsyncGraphProcessor : GraphProcessorBase
     {
-        private readonly float          durationPerNode;
-        private readonly IFactory<IRNG> randomFactory;
+        private readonly float durationPerNode;
+        private readonly IRNG  random;
 
         private const float FrameDuration = 1 / 60f;
 
-        public AsyncGraphProcessor(PCGraph graph, float durationPerNode) : base(graph)
+        public AsyncGraphProcessor(BaseGraph graph, float durationPerNode, IRNG random = null) : base(graph)
         {
             this.durationPerNode = durationPerNode;
-            this.randomFactory   = graph.RNG;
+            this.random = random ?? UnityRandom.Shared;
         }
 
-        public override void Run()
-        {
-            this.RunAsync().Last();
-        }
+        public override void Run() => this.RunAsync().Enumerate();
 
         public IEnumerable<float> RunAsync()
         {
-            var random = this.randomFactory.Create();
-
             foreach (var node in this.NodesByComputeOrder)
             {
                 if (node is IUsesRNG randomNode)
-                    randomNode.RNG = random;
+                    randomNode.RNG = this.random;
 
                 node.PullInputs();
 
                 if (node is IAsyncNode asyncNode)
                 {
                     var processor = new AsyncNodeProcessor(asyncNode, this.durationPerNode);
-                    var process   = processor.Process();
+                    var process = processor.Process();
 
                     while (process.MoveNext())
                         yield return processor.Duration;
@@ -64,18 +60,18 @@ namespace Chinchillada.PCGraphs
             {
                 this.node = node;
 
-                var expectedIterations   = node.ExpectedIterations;
+                var expectedIterations = node.ExpectedIterations;
                 var durationPerIteration = durationPerNode / expectedIterations;
 
                 if (durationPerIteration < FrameDuration)
                 {
                     this.iterationsPerFrame = Mathf.CeilToInt(FrameDuration / durationPerIteration);
-                    this.Duration           = -1;
+                    this.Duration = -1;
                 }
                 else
                 {
                     this.iterationsPerFrame = 1;
-                    this.Duration           = durationPerIteration;
+                    this.Duration = durationPerIteration;
                 }
             }
 
