@@ -1,6 +1,6 @@
 namespace Chinchillada.PCGraphs.Editor
 {
-    using Chinchillada.PCGraph;
+    using PCGraphs;
     using GraphProcessor;
     using JetBrains.Annotations;
     using UnityEngine;
