@@ -4,13 +4,17 @@ namespace Chinchillada.PCGraphs.Editor
     using UnityEngine;
     using UnityEngine.UIElements;
 
-    public abstract class GeneratorNodeViewWithTexture<TNode, TResult> : BaseGeneratorNodeView<TNode, TResult>
+    public abstract class GeneratorNodeViewWithTexture<TNode, TResult> : BaseGeneratorNodeView<TNode, TResult>, 
+                                                                         IHasPreviewTexture
         where TNode : GeneratorNode<TResult>
     {
         protected const int MinResolution = 100;
 
         private Image previewImage;
-        
+
+        public Texture Preview => this.previewImage.image;
+
+
         protected override void CreateControls(VisualElement controlContainer)
         {
             base.CreateControls(controlContainer);
@@ -39,5 +43,6 @@ namespace Chinchillada.PCGraphs.Editor
                 ? texture
                 : texture.Upscale(upscale);
         }
+
     }
 }

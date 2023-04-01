@@ -15,19 +15,26 @@ namespace Chinchillada.PCGraphs
         {
             int ticksToGo = ticksPerFrame;
             
-            foreach (var result in this.GenerateAsync())
+            this.OnBeforeGenerate();
+            
+            foreach (T result in this.GenerateAsync())
             {
+                this.OnGenerate(result);
+
                 if (--ticksToGo > 0)
                     continue;
                 
-                this.OnGenerate(result);
                 this.InvokeOnProcessed();
-
                 yield return null;
                 ticksToGo = ticksPerFrame;
             }
+
+            this.InvokeOnProcessed();
+            yield return null;
         }
 
         protected abstract IEnumerable<T> GenerateAsync();
+        
+        protected virtual void OnBeforeGenerate() {}
     }
 }

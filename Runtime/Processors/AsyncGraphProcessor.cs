@@ -4,7 +4,6 @@ namespace Chinchillada.PCGraphs
 {
     using System.Collections;
     using System.Collections.Generic;
-    using System.Linq;
     using UnityEngine;
 
     public class AsyncGraphProcessor : GraphProcessorBase
@@ -13,6 +12,8 @@ namespace Chinchillada.PCGraphs
         private readonly IRNG  random;
 
         private const float FrameDuration = 1 / 60f;
+        
+        public BaseNode CurrentNode { get; private set; }
 
         public AsyncGraphProcessor(BaseGraph graph, float durationPerNode, IRNG random = null) : base(graph)
         {
@@ -24,8 +25,10 @@ namespace Chinchillada.PCGraphs
 
         public IEnumerable<float> RunAsync()
         {
-            foreach (var node in this.NodesByComputeOrder)
+            foreach (BaseNode node in this.NodesByComputeOrder)
             {
+                this.CurrentNode = node;
+
                 if (node is IUsesRNG randomNode)
                     randomNode.RNG = this.random;
 

@@ -1,7 +1,5 @@
 namespace Chinchillada.PCGraphs.Editor
 {
-    using System.Collections.Generic;
-    using System.Linq;
     using Chinchillada;
     using GraphProcessor;
     using UnityEngine.UIElements;
