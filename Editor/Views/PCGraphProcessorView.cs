@@ -37,7 +37,7 @@ namespace Chinchillada.PCGraphs.Editor
             yield return new Button(this.Refresh) { name         = "ActionButton", text = "Refresh" };
             yield return new Button(this.RefreshStepwise) { name = "StepButton", text   = "Refresh Stepwise" };
 
-            yield return durationPerNode = new FloatField("Step duration") { value = 0.8f };
+            yield return durationPerNode = new FloatField("Step duration") { value = 0.4f };
             yield return this.preview = new Image();
         }
 
