@@ -7,7 +7,7 @@ namespace Chinchillada.PCGraphs
     public class WeightedIntNode : GeneratorNode<WeightedItem<int>>
     {
         [Input, ShowAsDrawer] public int   value;
-        [Input, ShowAsDrawer] public float weight;
+        [Input, ShowAsDrawer] public int weight;
         
         public override WeightedItem<int> Generate()
         {
