@@ -8,6 +8,9 @@ namespace Chinchillada.PCGraphs
     [Serializable]
     public abstract class AsyncGeneratorNode<T> : GeneratorNode<T>, IAsyncNode
     {
+        public virtual int  ExpectedIterations   => 1;
+        public virtual bool ForceOneFramePerStep => false;
+        
         public override T Generate()
         {
             this.OnBeforeGenerate();
@@ -18,8 +21,6 @@ namespace Chinchillada.PCGraphs
             this.InvokeOnProcessed();
             return result;
         }
-
-        public virtual int ExpectedIterations => 1;
 
         public IEnumerator OnProcessAsync(int ticksPerFrame)
         {

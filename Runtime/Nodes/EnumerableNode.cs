@@ -6,6 +6,8 @@ namespace Chinchillada.PCGraphs
     public interface IAsyncNode
     {
         int ExpectedIterations { get; }
+        
+        bool ForceOneFramePerStep { get; }
 
         IEnumerator OnProcessAsync(int ticksPerFrame);
     }

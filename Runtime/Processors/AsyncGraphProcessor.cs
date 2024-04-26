@@ -63,18 +63,18 @@ namespace Chinchillada.PCGraphs
             {
                 this.node = node;
 
-                var expectedIterations = node.ExpectedIterations;
-                var durationPerIteration = durationPerNode / expectedIterations;
+                int expectedIterations = node.ExpectedIterations;
+                float durationPerIteration = durationPerNode / expectedIterations;
 
-                if (durationPerIteration < FrameDuration)
-                {
-                    this.iterationsPerFrame = Mathf.CeilToInt(FrameDuration / durationPerIteration);
-                    this.Duration = -1;
-                }
-                else
+                if (node.ForceOneFramePerStep || durationPerIteration > FrameDuration)
                 {
                     this.iterationsPerFrame = 1;
                     this.Duration = durationPerIteration;
+                }
+                else
+                {
+                    this.iterationsPerFrame = Mathf.CeilToInt(FrameDuration / durationPerIteration);
+                    this.Duration = -1;
                 }
             }
 
