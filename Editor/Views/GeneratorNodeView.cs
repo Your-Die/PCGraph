@@ -59,10 +59,11 @@ namespace Chinchillada.PCGraphs.Editor
     public abstract class BaseGeneratorNodeView<TNode, TResult> : GeneratorNodeView 
         where TNode : GeneratorNode<TResult>
     {
+        protected TNode TypedNode => (TNode)this.nodeTarget;
+        
         protected override void OnNodeProcessed()
         {
-            var node = (TNode)this.nodeTarget;
-            this.UpdatePreview(node.Result);
+            this.UpdatePreview(this.TypedNode.Result);
             
             base.OnNodeProcessed();
         }
@@ -71,7 +72,7 @@ namespace Chinchillada.PCGraphs.Editor
 
         protected override void CreateControls(VisualElement controlContainer)
         {
-            if (!(this.Node is IIteratorNode<TResult> iteratorNode))
+            if (!(this.TypedNode is IIteratorNode<TResult> iteratorNode))
                 return;
             
             var button = new Button(() => this.RunIteration(iteratorNode))
