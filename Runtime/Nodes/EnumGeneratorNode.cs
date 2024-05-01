@@ -1,6 +1,7 @@
 using System;
+using Chinchillada.PCGraphs;
 
-namespace Chinchillada.PCGraphs.Grid.Ints
+namespace Chinchillada.Grid.PCGraphs.Ints
 {
     public class EnumGeneratorNode<T> : GeneratorNode<T>, IUsesRNG where T : Enum
     {
