@@ -7,7 +7,8 @@ namespace Chinchillada.PCGraphs
     {
         int ExpectedIterations { get; }
         
-        bool ForceOneFramePerStep { get; }
+        bool  ForceOneFramePerStep { get; }
+        float SpeedFactor          { get; }
 
         IEnumerator OnProcessAsync(int ticksPerFrame);
     }

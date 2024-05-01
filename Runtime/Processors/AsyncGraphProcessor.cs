@@ -64,7 +64,7 @@ namespace Chinchillada.PCGraphs
                 this.node = node;
 
                 int expectedIterations = node.ExpectedIterations;
-                float durationPerIteration = durationPerNode / expectedIterations;
+                float durationPerIteration = (durationPerNode / expectedIterations) * node.SpeedFactor;
 
                 if (node.ForceOneFramePerStep || durationPerIteration > FrameDuration)
                 {

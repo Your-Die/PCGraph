@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using Chinchillada.PCGraphs;
 using GraphProcessor;
 
-namespace Chinchillada
+namespace Chinchillada.PCGraphs
 {
     [Serializable]
-    public class ListNode<T> : GeneratorNode<List<T>>, IUsesRNG
+    public class ListFromSubgraphNode<T> : GeneratorNode<List<T>>, IUsesRNG
     {
         [Input, ShowAsDrawer] public int amount;
 

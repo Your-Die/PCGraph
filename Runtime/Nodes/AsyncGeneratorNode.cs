@@ -1,3 +1,6 @@
+using GraphProcessor;
+using UnityEngine;
+
 namespace Chinchillada.PCGraphs
 {
     using System;
@@ -8,8 +11,12 @@ namespace Chinchillada.PCGraphs
     [Serializable]
     public abstract class AsyncGeneratorNode<T> : GeneratorNode<T>, IAsyncNode
     {
+        [SerializeField, Setting] private float speedFactor = 1; 
+        
         public virtual int  ExpectedIterations   => 1;
         public virtual bool ForceOneFramePerStep => false;
+
+        public float SpeedFactor => this.speedFactor;
         
         public override T Generate()
         {
