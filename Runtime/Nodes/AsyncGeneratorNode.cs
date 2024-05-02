@@ -11,7 +11,7 @@ namespace Chinchillada.PCGraphs
     [Serializable]
     public abstract class AsyncGeneratorNode<T> : GeneratorNode<T>, IAsyncNode
     {
-        [SerializeField, Setting] private float speedFactor = 1; 
+        [SerializeField, Setting] public float speedFactor = 1; 
         
         public virtual int  ExpectedIterations   => 1;
         public virtual bool ForceOneFramePerStep => false;
