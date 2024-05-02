@@ -11,7 +11,9 @@ namespace Chinchillada.PCGraphs
     [Serializable]
     public abstract class AsyncGeneratorNode<T> : GeneratorNode<T>, IAsyncNode
     {
-        [SerializeField, Setting] public float speedFactor = 1; 
+        [SerializeField, Setting] public float speedFactor = 1;
+
+        [SerializeField, Setting] public int maxIterations = -1;
         
         public virtual int  ExpectedIterations   => 1;
         public virtual bool ForceOneFramePerStep => false;
@@ -22,7 +24,7 @@ namespace Chinchillada.PCGraphs
         {
             this.OnBeforeGenerate();
 
-            T result = this.GenerateAsync().Last();
+            T result = this.GetIterations().Last();
             this.OnGenerate(result);
 
             this.InvokeOnProcessed();
@@ -35,7 +37,7 @@ namespace Chinchillada.PCGraphs
 
             this.OnBeforeGenerate();
 
-            foreach (T result in this.GenerateAsync())
+            foreach (T result in this.GetIterations())
             {
                 this.OnGenerate(result);
 
@@ -50,11 +52,21 @@ namespace Chinchillada.PCGraphs
             this.InvokeOnProcessed();
             yield return null;
         }
-
+        
         protected abstract IEnumerable<T> GenerateAsync();
 
         protected virtual void OnBeforeGenerate()
         {
+        }
+
+        private IEnumerable<T> GetIterations()
+        {
+            var iterations = this.GenerateAsync();
+            
+            if (this.maxIterations > 0) 
+                iterations = iterations.Take(this.maxIterations);
+
+            return iterations;
         }
     }
 }
