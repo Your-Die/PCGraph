@@ -4,7 +4,7 @@ using GraphProcessor;
 
 namespace Chinchillada.PCGraphs
 {
-    [Serializable]
+    [Serializable, NodeMenuItem("List/Int/From Distribution")]
     public class IntListNode : IntListGeneratorNode, IUsesRNG
     {
         [Input] public IDistribution<int> distribution;
