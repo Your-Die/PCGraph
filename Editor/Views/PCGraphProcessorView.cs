@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Chinchillada.PCGraphs.Editor
@@ -10,17 +11,18 @@ namespace Chinchillada.PCGraphs.Editor
 
     public class PCGraphProcessorView : PinnedElementView
     {
-        private PCGraph       graph;
+        private PCGraph graph;
         private BaseGraphView graphView;
 
         private EditorCoroutine refreshRoutine;
 
         private static FloatField durationPerNode;
+        private static IntegerField iterationsPerStep;
 
         private Image preview;
 
         private ManualGraphProcessor manualProcessor;
-        
+
         protected override void Initialize(BaseGraphView view)
         {
             this.title = "Process Panel";
@@ -35,16 +37,17 @@ namespace Chinchillada.PCGraphs.Editor
 
         private IEnumerable<VisualElement> BuildElements()
         {
-            yield return new Button(this.Refresh) { name         = "ActionButton", text = "Refresh" };
-            yield return new Button(this.RefreshStepwise) { name = "StepButton", text   = "Refresh Stepwise" };
-            yield return new Button(this.StartManual) { name = "StartManualButton", text   = "Start Manual" };
-            yield return new Button(this.StepManual) { name = "StepManualButton", text   = "Step Manual" };
+            yield return new Button(this.Refresh) { name = "ActionButton", text = "Refresh" };
+            yield return new Button(this.RefreshStepwise) { name = "StepButton", text = "Refresh Stepwise" };
+            yield return new Button(this.StartManual) { name = "StartManualButton", text = "Start Manual" };
+            yield return new Button(this.ManualForward) { name = "StepManualForwardButton", text = "Manual Forward" };
+            yield return new Button(this.ManualBackward)
+                { name = "StepManualBackwardButton", text = "Manual Backward" };
 
             yield return durationPerNode = new FloatField("Step duration") { value = 0.4f };
-            yield return durationPerNode = new FloatField("Manual: iterations per step") { value = 1 };
+            yield return iterationsPerStep = new IntegerField("Manual: iterations per step") { value = 1 };
             yield return this.preview = new Image();
         }
-
 
 
         private void Refresh()
@@ -74,7 +77,7 @@ namespace Chinchillada.PCGraphs.Editor
                 foreach (var stepDuration in process)
                 {
                     UpdatePreview(processor.CurrentNode);
-                    
+
                     if (stepDuration > 0)
                         yield return new EditorWaitForSeconds(stepDuration);
                     else
@@ -86,19 +89,35 @@ namespace Chinchillada.PCGraphs.Editor
         private void StartManual()
         {
             this.StopRoutine();
-            
-            this.manualProcessor = new ManualGraphProcessor(this.graph);
-            this.manualProcessor.Reset();
-            
-            this.manualProcessor.MoveNext();
-        }
-        
-        private void StepManual()
-        {
+
+            var seed = UnityRandom.Shared.Int();
+            this.manualProcessor = new ManualGraphProcessor(this.graph, seed);
+
             this.manualProcessor.MoveNext();
             this.UpdatePreview(this.manualProcessor.CurrentNode);
         }
-        
+
+        private void ManualForward()
+        {
+            if (this.manualProcessor == null)
+            {
+                this.StartManual();
+            }
+            else
+            {
+                this.manualProcessor.MoveNext(iterationsPerStep.value);
+                this.UpdatePreview(this.manualProcessor.CurrentNode);
+            }
+        }
+
+        private void ManualBackward()
+        {
+            if (this.manualProcessor == null)
+                throw new InvalidOperationException("No previous step exists");
+
+            this.manualProcessor.MovePrevious(iterationsPerStep.value);
+        }
+
         private void UpdatePreview(BaseNode node)
         {
             if (!this.graphView.nodeViewsPerNode.TryGetValue(node, out BaseNodeView view))
@@ -111,8 +130,8 @@ namespace Chinchillada.PCGraphs.Editor
             {
                 this.preview.image = nodeWithPreview.Preview;
             }
-        }  
-        
+        }
+
         private void StopRoutine()
         {
             if (this.refreshRoutine != null)

@@ -1,30 +1,58 @@
-﻿using System.Collections;
-using GraphProcessor;
+﻿using GraphProcessor;
 
 namespace Chinchillada.PCGraphs
 {
-    public class ManualGraphProcessor : GraphProcessorBase, IEnumerator
+    public class ManualGraphProcessor : GraphProcessorBase
     {
-        private readonly IRNG  random;
+        private readonly int seed;
+        private IRNG  random;
         private int currentNodeIndex;
 
+        private int executedSteps = 0;
+        
         public BaseNode CurrentNode { get; private set; }
 
-        public object Current => this.CurrentNode;
-
-        public ManualGraphProcessor(BaseGraph graph, IRNG random = null) : base(graph)
+        public ManualGraphProcessor(BaseGraph graph, int seed) : base(graph)
         {
-            this.random = random ?? UnityRandom.Shared;
+            this.seed = seed;
+            this.Reset();
         }
 
-        public override void Run() => this.EnumerateFully();
+        public override void Run()
+        {
+            while (this.MoveNext()) { }
+        }
 
         public void Reset()
         {
             this.currentNodeIndex = -1;
+            this.random = new CRandom(this.seed);
         }
 
-        public bool MoveNext()
+        public bool MovePrevious(int steps = 1)
+        {
+            if (this.executedSteps < steps)
+            {
+                this.Reset();
+                return this.MoveNext();
+            }
+
+            this.Reset();
+            return this.MoveUntilStep(this.executedSteps - steps);
+        }
+        
+        public bool MoveUntilStep(int step)
+        {
+            while (this.executedSteps < step)
+            {
+                if (!this.MoveNext())
+                    return false;
+            }
+
+            return true;
+        }
+
+        public bool MoveNext(int steps = 1)
         {
             this.currentNodeIndex++;
             if (this.currentNodeIndex >= this.NodesByComputeOrder.Length)
@@ -39,7 +67,7 @@ namespace Chinchillada.PCGraphs
             
             if (this.CurrentNode is IAsyncNode asyncNode)
             {
-                asyncNode.OnProcessAsync(1);
+                asyncNode.OnProcessAsync(steps);
             }
             else
             {
@@ -47,8 +75,8 @@ namespace Chinchillada.PCGraphs
             }
 
             this.CurrentNode.outputPorts.PushDatas();
+            this.executedSteps += steps;
             return true;
         }
-
     }
 }
