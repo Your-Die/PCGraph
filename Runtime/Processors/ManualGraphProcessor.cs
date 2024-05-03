@@ -41,6 +41,9 @@ namespace Chinchillada.PCGraphs
 
         public bool MovePrevious(int steps = 1)
         {
+            //TODO: Now reprocesses the full graph until the given step. Nodes already cache their result,
+            // so we can optimize by only resimulating from the node containing the step. 
+            
             var targetStep = this.executedSteps - steps;
             if (targetStep < 0)
             {

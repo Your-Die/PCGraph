@@ -40,8 +40,10 @@ namespace Chinchillada.PCGraphs.Editor
             yield return new Button(this.Refresh) { name = "ActionButton", text = "Refresh" };
             yield return new Button(this.RefreshStepwise) { name = "StepButton", text = "Refresh Stepwise" };
             yield return new Button(this.StartManual) { name = "StartManualButton", text = "Start Manual" };
-            yield return new Button(this.ManualForward) { name = "StepManualForwardButton", text = "Manual Forward" };
-            yield return new Button(this.ManualBackward) { name = "StepManualBackwardButton", text = "Manual Backward" };
+            yield return new Button(this.AutomateManual) { name = "ContinueButton", text = "Continue" };
+            yield return new Button(this.Pause) { name = "PauseButton", text = "Pause" };
+            yield return new Button(this.ManualForward) { name = "StepManualForwardButton", text = "Step Forward" };
+            yield return new Button(this.ManualBackward) { name = "StepManualBackwardButton", text = "Step Backward" };
 
             yield return durationPerNode = new FloatField("Step duration") { value = 0.4f };
             yield return iterationsPerStep = new IntegerField("Manual: iterations per step") { value = 1 };
@@ -63,11 +65,8 @@ namespace Chinchillada.PCGraphs.Editor
         {
             var processor = new AsyncGraphProcessor(this.graph, durationPerNode.value);
 
-            this.StopRoutine();
-
             processor.UpdateComputeOrder();
-
-            this.refreshRoutine = EditorCoroutineUtility.StartCoroutine(Routine(), this);
+            StartRoutine(Routine());
 
             IEnumerator Routine()
             {
@@ -85,19 +84,51 @@ namespace Chinchillada.PCGraphs.Editor
             }
         }
 
+        private void StartRoutine(IEnumerator routine)
+        {
+            this.StopRoutine();
+            this.refreshRoutine = EditorCoroutineUtility.StartCoroutine(routine, this);
+        }
+        
+        private void AutomateManual()
+        {
+            if (this.manualProcessor == null) 
+                this.CreateManualProcessor();
+
+            this.StartRoutine(Routine());
+
+            IEnumerator Routine()
+            {
+                while (this.manualProcessor != null && this.manualProcessor.MoveNext(iterationsPerStep.value))
+                {
+                    UpdatePreview(this.manualProcessor.CurrentNode);
+                    yield return new EditorWaitForSeconds(durationPerNode.value);
+                }
+            }
+        }
+
+        private void Pause() => this.StopRoutine();
+
         private void StartManual()
         {
             this.StopRoutine();
 
-            var seed = UnityRandom.Shared.Int();
-            this.manualProcessor = new ManualGraphProcessor(this.graph, seed);
+            this.CreateManualProcessor();
 
             this.manualProcessor.MoveNext();
             this.UpdatePreview(this.manualProcessor.CurrentNode);
         }
 
+        private void CreateManualProcessor()
+        {
+            var seed = UnityRandom.Shared.Int();
+            this.manualProcessor = new ManualGraphProcessor(this.graph, seed);
+        }
+
         private void ManualForward()
         {
+            this.StopRoutine();
+            
             if (this.manualProcessor == null)
             {
                 this.StartManual();
@@ -111,6 +142,8 @@ namespace Chinchillada.PCGraphs.Editor
 
         private void ManualBackward()
         {
+            this.StopRoutine();
+            
             if (this.manualProcessor == null)
                 throw new InvalidOperationException("No previous step exists");
 
