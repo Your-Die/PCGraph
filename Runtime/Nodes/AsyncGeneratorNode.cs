@@ -14,12 +14,38 @@ namespace Chinchillada.PCGraphs
         [SerializeField, Setting] public float speedFactor = 1;
 
         [SerializeField, Setting] public int maxIterations = -1;
+
+        private IEnumerator<T> enumerator;
         
         public virtual int  ExpectedIterations   => 1;
         public virtual bool ForceOneFramePerStep => false;
 
         public float SpeedFactor => this.speedFactor;
-        
+        public void ResetProcess()
+        {
+            this.OnBeforeGenerate();
+            this.enumerator = this.GetIterations().GetEnumerator();
+        }
+
+        public int MoveNext(int steps)
+        {
+            for (int step = 0; step < steps; step++)
+            {
+                if (this.enumerator.MoveNext())
+                {
+                    this.OnGenerate(this.enumerator.Current);
+                }
+                else
+                {
+                    this.InvokeOnProcessed();
+                    return steps - step;
+                }
+            }
+            
+            this.InvokeOnProcessed();
+            return 0;
+        }
+
         public override T Generate()
         {
             this.OnBeforeGenerate();

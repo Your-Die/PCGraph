@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using GraphProcessor;
-using UnityEngine;
 
 namespace Chinchillada.PCGraphs
 {
@@ -10,7 +8,7 @@ namespace Chinchillada.PCGraphs
         private readonly int seed;
 
         private int currentNodeIndex;
-        private IEnumerator currentEnumerator;
+        private IAsyncNode currentAsyncNode;
 
         private IRNG random;
         private int executedSteps = 0;
@@ -35,7 +33,7 @@ namespace Chinchillada.PCGraphs
         public void Reset()
         {
             this.currentNodeIndex = -1;
-            this.currentEnumerator = null;
+            this.currentAsyncNode = null;
             this.executedSteps = 0;
             this.random = new CRandom(this.seed);
             this.CurrentNode = null;
@@ -56,7 +54,7 @@ namespace Chinchillada.PCGraphs
 
         public bool MoveNext(int steps = 1)
         {
-            if (this.currentEnumerator != null)
+            if (this.currentAsyncNode != null)
                 steps = this.EnumerateSteps(steps);
 
             while (steps > 0)
@@ -73,7 +71,9 @@ namespace Chinchillada.PCGraphs
 
                 if (this.CurrentNode is IAsyncNode asyncNode)
                 {
-                    this.currentEnumerator = asyncNode.OnProcessAsync(1);
+                    this.currentAsyncNode = asyncNode;
+                    this.currentAsyncNode.ResetProcess();
+                    
                     steps = this.EnumerateSteps(steps);
                 }
                 else
@@ -97,19 +97,19 @@ namespace Chinchillada.PCGraphs
 
         private int EnumerateSteps(int steps)
         {
-            while (this.currentEnumerator.MoveNext())
+            var remainingSteps = this.currentAsyncNode.MoveNext(steps);
+            if (remainingSteps <= 0)
             {
-                steps--;
-                this.executedSteps++;
-
-                if (steps <= 0)
-                    return 0;
+                this.executedSteps += steps;
+                return 0;
             }
 
+            this.executedSteps += steps - remainingSteps;
+            
             this.PushCurrentNode();
-            this.currentEnumerator = null;
+            this.currentAsyncNode = null;
 
-            return steps;
+            return remainingSteps;
         }
 
         private void PullCurrentNode() => this.CurrentNode.inputPorts.PullDatas();

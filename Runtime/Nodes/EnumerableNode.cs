@@ -10,6 +10,17 @@ namespace Chinchillada.PCGraphs
         bool  ForceOneFramePerStep { get; }
         float SpeedFactor          { get; }
 
+        void ResetProcess();
+        
+        /// <summary>
+        /// Moves the amount of <paramref name="steps"/> forward.
+        /// </summary>
+        /// <returns>
+        /// If the node finished before executing the requested amount of <paramref name="steps"/>,
+        /// it will return the remainder. Otherwise 0.
+        /// </returns>
+        int MoveNext(int steps);
+
         IEnumerator OnProcessAsync(int ticksPerFrame);
     }
 
