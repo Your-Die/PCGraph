@@ -9,10 +9,10 @@ namespace Chinchillada.PCGraphs
     public class AsyncGraphProcessor : GraphProcessorBase
     {
         private readonly float durationPerNode;
-        private readonly IRNG  random;
+        private readonly IRNG random;
 
         private const float FrameDuration = 1 / 60f;
-        
+
         public BaseNode CurrentNode { get; private set; }
 
         public AsyncGraphProcessor(BaseGraph graph, float durationPerNode, IRNG random = null) : base(graph)

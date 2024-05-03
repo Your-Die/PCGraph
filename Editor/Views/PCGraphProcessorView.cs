@@ -6,7 +6,6 @@ namespace Chinchillada.PCGraphs.Editor
     using System.Collections.Generic;
     using GraphProcessor;
     using Unity.EditorCoroutines.Editor;
-    using UnityEditor.UIElements;
     using UnityEngine.UIElements;
 
     public class PCGraphProcessorView : PinnedElementView
@@ -19,6 +18,8 @@ namespace Chinchillada.PCGraphs.Editor
         private static FloatField durationPerNode;
 
         private Image preview;
+
+        private ManualGraphProcessor manualProcessor;
         
         protected override void Initialize(BaseGraphView view)
         {
@@ -36,13 +37,20 @@ namespace Chinchillada.PCGraphs.Editor
         {
             yield return new Button(this.Refresh) { name         = "ActionButton", text = "Refresh" };
             yield return new Button(this.RefreshStepwise) { name = "StepButton", text   = "Refresh Stepwise" };
+            yield return new Button(this.StartManual) { name = "StartManualButton", text   = "Start Manual" };
+            yield return new Button(this.StepManual) { name = "StepManualButton", text   = "Step Manual" };
 
             yield return durationPerNode = new FloatField("Step duration") { value = 0.4f };
+            yield return durationPerNode = new FloatField("Manual: iterations per step") { value = 1 };
             yield return this.preview = new Image();
         }
 
+
+
         private void Refresh()
         {
+            this.StopRoutine();
+
             var processor = new PCGraphProcessor(this.graph);
 
             processor.UpdateComputeOrder();
@@ -53,8 +61,7 @@ namespace Chinchillada.PCGraphs.Editor
         {
             var processor = new AsyncGraphProcessor(this.graph, durationPerNode.value);
 
-            if (this.refreshRoutine != null)
-                EditorCoroutineUtility.StopCoroutine(this.refreshRoutine);
+            this.StopRoutine();
 
             processor.UpdateComputeOrder();
 
@@ -76,6 +83,22 @@ namespace Chinchillada.PCGraphs.Editor
             }
         }
 
+        private void StartManual()
+        {
+            this.StopRoutine();
+            
+            this.manualProcessor = new ManualGraphProcessor(this.graph);
+            this.manualProcessor.Reset();
+            
+            this.manualProcessor.MoveNext();
+        }
+        
+        private void StepManual()
+        {
+            this.manualProcessor.MoveNext();
+            this.UpdatePreview(this.manualProcessor.CurrentNode);
+        }
+        
         private void UpdatePreview(BaseNode node)
         {
             if (!this.graphView.nodeViewsPerNode.TryGetValue(node, out BaseNodeView view))
@@ -88,6 +111,12 @@ namespace Chinchillada.PCGraphs.Editor
             {
                 this.preview.image = nodeWithPreview.Preview;
             }
+        }  
+        
+        private void StopRoutine()
+        {
+            if (this.refreshRoutine != null)
+                EditorCoroutineUtility.StopCoroutine(this.refreshRoutine);
         }
     }
 }
