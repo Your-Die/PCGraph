@@ -1,16 +1,23 @@
-﻿using GraphProcessor;
+﻿using System;
+using System.Collections;
+using GraphProcessor;
+using UnityEngine;
 
 namespace Chinchillada.PCGraphs
 {
     public class ManualGraphProcessor : GraphProcessorBase
     {
         private readonly int seed;
-        private IRNG  random;
-        private int currentNodeIndex;
 
+        private int currentNodeIndex;
+        private IEnumerator currentEnumerator;
+
+        private IRNG random;
         private int executedSteps = 0;
-        
+
         public BaseNode CurrentNode { get; private set; }
+
+        public object Current => this.CurrentNode;
 
         public ManualGraphProcessor(BaseGraph graph, int seed) : base(graph)
         {
@@ -20,63 +27,92 @@ namespace Chinchillada.PCGraphs
 
         public override void Run()
         {
-            while (this.MoveNext()) { }
+            while (this.MoveNext())
+            {
+            }
         }
 
         public void Reset()
         {
             this.currentNodeIndex = -1;
+            this.currentEnumerator = null;
+            this.executedSteps = 0;
             this.random = new CRandom(this.seed);
+            this.CurrentNode = null;
         }
 
         public bool MovePrevious(int steps = 1)
         {
-            if (this.executedSteps < steps)
+            var targetStep = this.executedSteps - steps;
+            if (targetStep < 0)
             {
                 this.Reset();
                 return this.MoveNext();
             }
 
             this.Reset();
-            return this.MoveUntilStep(this.executedSteps - steps);
-        }
-        
-        public bool MoveUntilStep(int step)
-        {
-            while (this.executedSteps < step)
-            {
-                if (!this.MoveNext())
-                    return false;
-            }
-
-            return true;
+            return this.MoveUntilStep(targetStep);
         }
 
         public bool MoveNext(int steps = 1)
         {
-            this.currentNodeIndex++;
-            if (this.currentNodeIndex >= this.NodesByComputeOrder.Length)
-                return false;
-            
-            this.CurrentNode = this.NodesByComputeOrder[this.currentNodeIndex];
-            
-            if (this.CurrentNode is IUsesRNG randomNode)
-                randomNode.RNG = this.random;
+            if (this.currentEnumerator != null)
+                steps = this.EnumerateSteps(steps);
 
-            this.CurrentNode.inputPorts.PullDatas();
-            
-            if (this.CurrentNode is IAsyncNode asyncNode)
+            while (steps > 0)
             {
-                asyncNode.OnProcessAsync(steps);
-            }
-            else
-            {
-                this.CurrentNode.OnProcess();
+                this.currentNodeIndex++;
+                if (this.currentNodeIndex >= this.NodesByComputeOrder.Length)
+                    return false;
+
+                this.CurrentNode = this.NodesByComputeOrder[this.currentNodeIndex];
+                if (this.CurrentNode is IUsesRNG randomNode)
+                    randomNode.RNG = this.random;
+
+                this.PullCurrentNode();
+
+                if (this.CurrentNode is IAsyncNode asyncNode)
+                {
+                    this.currentEnumerator = asyncNode.OnProcessAsync(1);
+                    steps = this.EnumerateSteps(steps);
+                }
+                else
+                {
+                    this.CurrentNode.OnProcess();
+                    this.PushCurrentNode();
+                }
             }
 
-            this.CurrentNode.outputPorts.PushDatas();
-            this.executedSteps += steps;
             return true;
         }
+
+        private bool MoveUntilStep(int step)
+        {
+            var difference = step - this.executedSteps;
+            if (difference <= 0)
+                throw new ArgumentException($"sep is in the past: {step}, current step: {this.executedSteps}");
+
+            return this.MoveNext(difference);
+        }
+
+        private int EnumerateSteps(int steps)
+        {
+            while (this.currentEnumerator.MoveNext())
+            {
+                steps--;
+                this.executedSteps++;
+
+                if (steps <= 0)
+                    return 0;
+            }
+
+            this.PushCurrentNode();
+            this.currentEnumerator = null;
+
+            return steps;
+        }
+
+        private void PullCurrentNode() => this.CurrentNode.inputPorts.PullDatas();
+        private void PushCurrentNode() => this.CurrentNode.outputPorts.PushDatas();
     }
 }

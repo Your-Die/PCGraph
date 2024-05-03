@@ -41,8 +41,7 @@ namespace Chinchillada.PCGraphs.Editor
             yield return new Button(this.RefreshStepwise) { name = "StepButton", text = "Refresh Stepwise" };
             yield return new Button(this.StartManual) { name = "StartManualButton", text = "Start Manual" };
             yield return new Button(this.ManualForward) { name = "StepManualForwardButton", text = "Manual Forward" };
-            yield return new Button(this.ManualBackward)
-                { name = "StepManualBackwardButton", text = "Manual Backward" };
+            yield return new Button(this.ManualBackward) { name = "StepManualBackwardButton", text = "Manual Backward" };
 
             yield return durationPerNode = new FloatField("Step duration") { value = 0.4f };
             yield return iterationsPerStep = new IntegerField("Manual: iterations per step") { value = 1 };
