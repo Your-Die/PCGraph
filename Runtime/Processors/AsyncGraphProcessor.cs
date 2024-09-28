@@ -32,7 +32,7 @@ namespace Chinchillada.PCGraphs
                 if (node is IUsesRNG randomNode)
                     randomNode.RNG = this.random;
 
-                node.inputPorts.PullDatas();
+                node.PullInputs();
 
                 if (node is IAsyncNode asyncNode)
                 {
@@ -47,7 +47,7 @@ namespace Chinchillada.PCGraphs
                     node.OnProcess();
                 }
 
-                node.outputPorts.PushDatas();
+                node.PushOutputs();
             }
         }
 
