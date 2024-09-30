@@ -9,10 +9,8 @@ namespace Chinchillada.PCGraphs
     public class AsyncGraphProcessor : GraphProcessorBase
     {
         private readonly float durationPerNode;
-        private readonly IRNG  random;
+        private readonly IRNG random;
 
-        private const float FrameDuration = 1 / 60f;
-        
         public BaseNode CurrentNode { get; private set; }
 
         public AsyncGraphProcessor(BaseGraph graph, float durationPerNode, IRNG random = null) : base(graph)
@@ -50,35 +48,37 @@ namespace Chinchillada.PCGraphs
                 node.PushOutputs();
             }
         }
+    }
 
-        private readonly struct AsyncNodeProcessor
+    public readonly struct AsyncNodeProcessor
+    {
+        private readonly IAsyncNode node;
+
+        private readonly int iterationsPerFrame;
+
+        public float Duration { get; }
+
+        private const float FrameDuration = 1 / 60f;
+        
+        public AsyncNodeProcessor(IAsyncNode node, float durationPerNode)
         {
-            private readonly IAsyncNode node;
+            this.node = node;
 
-            private readonly int iterationsPerFrame;
+            int expectedIterations = node.ExpectedIterations;
+            float durationPerIteration = (durationPerNode / expectedIterations) * node.SpeedFactor;
 
-            public float Duration { get; }
-
-            public AsyncNodeProcessor(IAsyncNode node, float durationPerNode)
+            if (node.ForceOneFramePerStep || durationPerIteration > FrameDuration)
             {
-                this.node = node;
-
-                int expectedIterations = node.ExpectedIterations;
-                float durationPerIteration = (durationPerNode / expectedIterations) * node.SpeedFactor;
-
-                if (node.ForceOneFramePerStep || durationPerIteration > FrameDuration)
-                {
-                    this.iterationsPerFrame = 1;
-                    this.Duration = durationPerIteration;
-                }
-                else
-                {
-                    this.iterationsPerFrame = Mathf.CeilToInt(FrameDuration / durationPerIteration);
-                    this.Duration = -1;
-                }
+                this.iterationsPerFrame = 1;
+                this.Duration = durationPerIteration;
             }
-
-            public IEnumerator Process() => this.node.OnProcessAsync(this.iterationsPerFrame);
+            else
+            {
+                this.iterationsPerFrame = Mathf.CeilToInt(FrameDuration / durationPerIteration);
+                this.Duration = -1;
+            }
         }
+
+        public IEnumerator Process() => this.node.OnProcessAsync(this.iterationsPerFrame);
     }
 }
